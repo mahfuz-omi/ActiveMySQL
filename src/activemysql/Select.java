@@ -37,13 +37,19 @@ public class Select {
     private String password;
     
     
-    //instance initializer...called before constructor
+    public void initialize()
     {
-    
-    
           Annotation[] annotations = className.getAnnotations();
-
-          for(Annotation annotation : annotations)
+          if(annotations.length == 0)
+          {
+              this.databaseName = "Test";
+              this.userName = "root";
+              this.password = "";    
+              
+          }
+          else
+          {
+              for(Annotation annotation : annotations)
           {
             if(annotation instanceof DBSettings)
             {
@@ -51,12 +57,13 @@ public class Select {
                 this.databaseName = myAnnotation.databaseName();
                 this.userName = myAnnotation.userName();
                 this.password = myAnnotation.password();
-                
-                System.out.println("name: " + myAnnotation.databaseName());
-                System.out.println("value: " + myAnnotation.userName());
-                System.out.println("value: " + myAnnotation.password());
+               
             }
           }
+              
+          }
+
+          
     
     }
     
@@ -88,6 +95,7 @@ public class Select {
     {
         this.className = className;
         this.tableName = className.getSimpleName();
+        this.initialize();
         return this;
     }
     
@@ -111,7 +119,7 @@ public class Select {
             
         }
         this.whereClause = where.toString();
-        System.out.println("omi "+where.toString());
+        //System.out.println("omi "+where.toString());
         
         return this;   
     }
@@ -141,7 +149,7 @@ public class Select {
         }
         sql.append(";");
         String finalSQL = sql.toString();
-        System.out.println("in execute:"+finalSQL);
+        //System.out.println("in execute:"+finalSQL);
         
         Connection c = null;
         Statement stmt = null;

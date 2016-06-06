@@ -17,5 +17,4 @@ public @interface DBSettings {
     String databaseName()default "Test";
     String userName() default "root";
     String password() default "";
-    
 }

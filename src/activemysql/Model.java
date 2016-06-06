@@ -79,7 +79,7 @@ public class Model {
         q = q.substring(0, q.length()-1)+")";
         sql = sql + q + ";";
       
-        System.out.println("final sql: "+sql);
+        //System.out.println("final sql: "+sql);
         
         
         Connection con = null;
@@ -116,21 +116,28 @@ public class Model {
           
           
           Annotation[] annotations = c.getAnnotations();
-
-          for(Annotation annotation : annotations)
+          if(annotations.length == 0)
           {
-            if(annotation instanceof DBSettings)
-            {
-                DBSettings myAnnotation = (DBSettings) annotation;
-                this.databaseName = myAnnotation.databaseName();
-                this.userName = myAnnotation.userName();
-                this.password = myAnnotation.password();
-                
-                System.out.println("databaseName: " + myAnnotation.databaseName());
-                System.out.println("userName: " + myAnnotation.userName());
-                System.out.println("password: " + myAnnotation.password());
-            }
+              this.databaseName = "Test";
+              this.userName = "root";
+              this.password = "";     
           }
+          else
+          {
+              for(Annotation annotation : annotations)
+              {
+                if(annotation instanceof DBSettings)
+                 {
+                     DBSettings myAnnotation = (DBSettings) annotation;
+                     this.databaseName = myAnnotation.databaseName();
+                     this.userName = myAnnotation.userName();
+                     this.password = myAnnotation.password();
+                 }
+               }
+              
+          }
+
+          
           this.fields = c.getDeclaredFields();
           
           String sql = "CREATE TABLE IF NOT EXISTS "+this.tableName+" "+"(ID INTEGER PRIMARY KEY  AUTO_INCREMENT ,";
@@ -182,7 +189,7 @@ public class Model {
             sql = sql + p;
         }
         sql = sql.substring(0, sql.length()-1)+")";
-        System.out.println("final sql: "+sql);
+        //System.out.println("final sql: "+sql);
         
         Connection con = null;
         Statement stmt = null;
@@ -190,7 +197,10 @@ public class Model {
         try 
         {
           Class.forName("com.mysql.jdbc.Driver");
-          con = DriverManager.getConnection("jdbc:mysql://localhost/" + this.databaseName + "?" + "user=" + this.userName + "&password=" + this.password);
+          con = DriverManager.getConnection("jdbc:mysql://localhost/",userName,password);
+          stmt = con.createStatement();
+          stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS "+databaseName);
+          con = DriverManager.getConnection("jdbc:mysql://localhost/"+databaseName,userName,password);
           stmt = con.createStatement();
           stmt.executeUpdate(sql);
           stmt.close();
